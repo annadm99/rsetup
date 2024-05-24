@@ -35,7 +35,7 @@ user_append_group rock pwm
 
 # Resize root partition at the filesystem level
 #
-resize_root
+#resize_root
 
 # Disable services
 # Command:
