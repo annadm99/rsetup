@@ -17,14 +17,17 @@ Priority: standard
 Essential: yes
 Depends: device-tree-compiler,
          gdisk,
+         jq,
+         librtui (>= 0.1.6),
          parted,
          pkexec | policykit-1 (<< 122-1),
-         whiptail,
          python3,
          python3-yaml,
          u-boot-menu,
          ${misc:Depends},
 Suggests: aicrf-test,
+          gpiod,
+          sudo,
           x-terminal-emulator,
 Description: Radxa system setup utility
  Radxa system setup utility (rsetup) provides an user friendly menu to
@@ -49,20 +52,63 @@ Depends: rsetup (= ${binary:Version}),
 Description: Radxa system config - First boot configuration
  This package contains the default first boot script.
 
-Package: rsetup-config-hciattach-ttys1
-Architecture: all
-Section: admin
-Priority: standard
-Depends: rsetup (= ${binary:Version}),
-         ${misc:Depends},
-Description: Radxa system config - Attach UART Bluetooth on /dev/ttyS1
- This package attaches UART Bluetooth on /dev/ttyS1 on boot.
-
 Package: rsetup-config-aic8800-ttys1
 Architecture: all
 Section: admin
 Priority: standard
 Depends: rsetup (= ${binary:Version}),
          ${misc:Depends},
+Provides: rsetup-config-hciattach-ttys1 (= 0.4.0)
+Conflicts: rsetup-config-hciattach-ttys1 (<< 0.4.0)
+Replaces: rsetup-config-hciattach-ttys1 (<< 0.4.0)
 Description: Radxa system config - Attach AIC8800 Bluetooth on /dev/ttyS1
  This package attaches AIC8800 Bluetooth on /dev/ttyS1 on boot.
+
+Package: rsetup-config-rgb0-rainbow
+Architecture: all
+Section: admin
+Priority: standard
+Depends: rsetup (= ${binary:Version}),
+         ${misc:Depends},
+Description: Radxa system config - Set rgb0 LED's pattern to rainbow
+ This package set rgb0 LED's pattern to rainbow on boot.
+
+Package: rsetup-config-wan-led-eth0
+Architecture: all
+Section: admin
+Priority: standard
+Depends: rsetup (= ${binary:Version}),
+         ${misc:Depends},
+Provides: rsetup-config-wan-led-netdev
+Description: Radxa system config - Set wan-led LED's netdev to eth0
+ This package set wan-led LED's netdev to eth0 on boot.
+
+Package: rsetup-config-wan-led-enp1s0
+Architecture: all
+Section: admin
+Priority: standard
+Depends: rsetup (= ${binary:Version}),
+         ${misc:Depends},
+Provides: rsetup-config-wan-led-netdev
+Description: Radxa system config - Set wan-led LED's netdev to enp1s0
+ This package set wan-led LED's netdev to enp1s0 on boot.
+
+Package: rsetup-config-lan-led-eth0
+Architecture: all
+Section: admin
+Priority: standard
+Depends: rsetup (= ${binary:Version}),
+         ${misc:Depends},
+Provides: rsetup-config-lan-led-netdev
+Description: Radxa system config - Set lan-led LED's netdev to eth0
+ This package set lan-led LED's netdev to eth0 on boot.
+
+Package: rsetup-config-lan-led-enp1s0
+Architecture: all
+Section: admin
+Priority: standard
+Depends: rsetup (= ${binary:Version}),
+         ${misc:Depends},
+Provides: rsetup-config-lan-led-netdev
+Description: Radxa system config - Set lan-led LED's netdev to enp1s0
+ This package set lan-led LED's netdev to enp1s0 on boot.

@@ -1,5 +1,10 @@
 # shellcheck shell=bash
 
+mpp_enable_kernel_logging() {
+    sudo tee /sys/module/rk_vcodec/parameters/mpp_dev_debug <<<"0x100" >/dev/null
+    echo "Please check dmesg output for kernel debug output."
+}
+
 mpp_enable_logging() {
     export mpi_debug=1
     export mpp_debug=1
@@ -9,7 +14,7 @@ mpp_enable_logging() {
     export mpp_log_level=6
     export GST_DEBUG="2,*mpp*:4,*fps*:7"
     export LIBV4L_RKMPP_LOG_LEVEL=6
-    export DISPLAY=":0"
+    export DISPLAY="${DISPLAY:-:0}"
 }
 
 mpp_play() {

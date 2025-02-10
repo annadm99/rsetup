@@ -107,7 +107,7 @@ __overlay_show() {
 __overlay_validate() {
     local i item
     check_overlay_conflict_init
-    for i in "${RSETUP_CHECKLIST_STATE_NEW[@]}"
+    for i in "${RTUI_CHECKLIST_STATE_NEW[@]}"
     do
         item="$(checklist_getitem "$i")"
         if ! check_overlay_conflict "$U_BOOT_FDT_OVERLAYS_DIR/$item"*
@@ -122,7 +122,7 @@ __overlay_validate() {
         then
             if ! __depends_package "${title[0]}" "${package[@]}"
             then
-                msgbox "Failed to install required packages for '${title[0]}'."
+                msgbox "Failed to install required packages for '${title[0]}'." "$RTUI_PALETTE_ERROR"
                 return 1
             fi
         fi
@@ -137,18 +137,31 @@ __overlay_manage() {
 
     disable_overlays
 
-    local item
-    for i in "${RSETUP_CHECKLIST_STATE_NEW[@]}"
+    local items=() ret
+    for i in "${RTUI_CHECKLIST_STATE_NEW[@]}"
     do
-        item="$(checklist_getitem "$i")"
-        mv "$U_BOOT_FDT_OVERLAYS_DIR/$item.disabled" "$U_BOOT_FDT_OVERLAYS_DIR/$item"
+        items+=("$(checklist_getitem "$i")")
     done
 
-    if u-boot-update >/dev/null
+    if (( ${#items[@]} == 0 ))
+    then
+        u-boot-update
+        return
+    fi
+
+    if enable_overlays "${items[@]}"
     then
         msgbox "Selected overlays will be enabled at next boot."
     else
-        msgbox "Unable to update the boot config."
+        ret="$?"
+        case "$(( ret - 256 ))" in
+            "$ERROR_ILLEGAL_PARAMETERS")
+                msgbox "The selection contains non-existing overlays. Did you delete them?"
+                ;;
+            *)
+                msgbox "Unable to update the boot config."
+                ;;
+        esac
     fi
 }
 
@@ -159,7 +172,7 @@ __overlay_info() {
     fi
 
     local item title category description exclusive package i
-    for i in "${RSETUP_CHECKLIST_STATE_NEW[@]}"
+    for i in "${RTUI_CHECKLIST_STATE_NEW[@]}"
     do
         item="$(checklist_getitem "$i")"
         mapfile -t title < <(parse_dtbo "title" "$U_BOOT_FDT_OVERLAYS_DIR/$item"*)

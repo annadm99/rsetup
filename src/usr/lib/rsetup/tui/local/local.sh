@@ -17,13 +17,13 @@ __local_wifi_country() {
     iface=$(iw dev | grep Interface | awk '{print $2}')
     if [[ -z "$iface" ]]
     then
-        msgbox "No wireless interface found."
+        msgbox "No wireless interface found." "$RTUI_PALETTE_ERROR"
         return 1
     fi
 
     if ! wpa_cli -i "$iface" status &>/dev/null
     then
-        msgbox "Could not communicate with wpa_supplicant."
+        msgbox "Could not communicate with wpa_supplicant." "$RTUI_PALETTE_ERROR"
         return 1
     fi
 
@@ -38,12 +38,12 @@ __local_wifi_country() {
         radiolist_add "$REPLY" "OFF"
     done < /usr/share/zoneinfo/iso3166.tab
 
-    if radiolist_show "Select your Wi-Fi country:" && (( ${#RSETUP_RADIOLIST_STATE_NEW[@]} > 0 ))
+    if radiolist_show "Select your Wi-Fi country:" && ! radiolist_is_selection_empty
     then
-        local only_shrinked_index=${RSETUP_RADIOLIST_STATE_NEW}
+        local only_shrinked_index=${RTUI_RADIOLIST_STATE_NEW}
         trimmed_index=${only_shrinked_index//\"}
         index=$(( 3 * trimmed_index + 1 ))
-        local country=${RSETUP_RADIOLIST[$index]}
+        local country=${RTUI_RADIOLIST[$index]}
 
         if yesno "Are you sure to change Wi-Fi country to: '$country'?"
         then

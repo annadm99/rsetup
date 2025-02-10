@@ -50,52 +50,39 @@ Hostname has been set to $(hostname)."
 }
 
 __user_enable_auto_login (){
-    local username selected_tty_device parameter
+    local username service
     username="$(logname)"
 
     checklist_init
-    for i in /etc/systemd/system/getty.target.wants/*tty*.service
-    do
-        checklist_add "$(basename "$i")" "OFF"
-    done
-    if ! checklist_show "Please select the interface(s) you want to enable auto login:" || (( ${#RSETUP_CHECKLIST_STATE_NEW[@]} == 0))
+    while read -r; do
+        service="$(awk '{print $1}' <<< "$REPLY")"
+        checklist_add "$service" "$(get_autologin_status "$service")"
+    done < <(systemctl list-units --state running --no-legend -- "*getty@*.service" sddm.service gdm.service lightdm.service)
+    if ! checklist_show "Please select the service(s) you want to enable auto login:"
     then
         return
     fi
 
-    if ! yesno "After auto login is enabled, your current password will be deleted, and you can only login SSH with public key.
-Are you sure to continue?"
-    then
-        return
-    fi
+    while read -r; do
+        service="$(awk '{print $1}' <<< "$REPLY")"
+        set_autologin_status "$username" "$service" "OFF"
+    done < <(systemctl list-units --state running --no-legend -- "*getty@*.service" sddm.service gdm.service lightdm.service)
 
-    for selected_tty_shrinked_index in "${RSETUP_CHECKLIST_STATE_NEW[@]}"
+    for i in "${RTUI_CHECKLIST_STATE_NEW[@]}"
     do
-        selected_tty_real_index=$((3*${selected_tty_shrinked_index//\"}+1))
-        selected_tty_device=${RSETUP_CHECKLIST[${selected_tty_real_index}]}
-        SYSTEMD_OVERRIDE=/etc/systemd/system/getty.target.wants/$selected_tty_device.d
-        mkdir -p "$SYSTEMD_OVERRIDE"
-        cat << EOF > "$SYSTEMD_OVERRIDE/override.conf"
-[Service]
-ExecStart=
-EOF
-        parameter="$(grep "ExecStart" "/etc/systemd/system/getty.target.wants/$selected_tty_device" | cut -d ' ' -f2-)"
-        AUTOLOGIN="ExecStart=-/sbin/agetty --autologin $username $parameter"
-        echo "$AUTOLOGIN" >> "$SYSTEMD_OVERRIDE/override.conf"
+        i="${i//\"}"
+        j=$((3 * i + 1))
+        service="${RTUI_CHECKLIST[$j]}"
+        set_autologin_status "$username" "$service" "ON"
     done
-    if passwd --delete "$username" >/dev/null
-    then
-        msgbox "Configuration succeeded"
-    fi
+
+    msgbox "Auto login settings has been updated."
 }
 
 __user() {
     menu_init
     menu_add __user_change_password "Change Password"
     menu_add __user_change_hostname "Change Hostname"
-    if $DEBUG
-    then
-        menu_add __user_enable_auto_login "Enable Auto Login"
-    fi
+    menu_add __user_enable_auto_login "Configure auto login"
     menu_show "User Settings"
 }

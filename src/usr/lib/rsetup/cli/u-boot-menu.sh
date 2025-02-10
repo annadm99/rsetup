@@ -58,25 +58,16 @@ disable_overlays() {
     done
 }
 
-__rebuild_overlays_worker() {
-    local overlay="$1" new_overlays="$2"
-
-    if [[ -n "$(dtbo_is_compatible "$overlay")" ]]
-    then
-        cp "$overlay" "$new_overlays/$(basename "$overlay").disabled"
-        exec 100>>"$new_overlays/managed.list"
-        flock 100
-        basename "$overlay" >&100
-    fi
-}
-
 rebuild_overlays() {
     load_u-boot_setting
 
-    local version="$1" vendor="$2" dtbos i
+    local version="$1" vendor="${2:-}" dtbos i
     local old_overlays new_overlays enabled_overlays=()
     old_overlays="$(realpath "$U_BOOT_FDT_OVERLAYS_DIR")"
     new_overlays="${old_overlays}_new"
+
+    echo "Rebuilding overlay data folder for '$version'..."
+
     if [[ -d "$old_overlays" ]]
     then
         cp -aR "$old_overlays" "$new_overlays"
@@ -86,6 +77,7 @@ rebuild_overlays() {
 
     if [[ -f "$new_overlays/managed.list" ]]
     then
+        echo "Removing managed overlays..."
         mapfile -t RSETUP_MANAGED_OVERLAYS < "$new_overlays/managed.list"
 
         for i in "${RSETUP_MANAGED_OVERLAYS[@]}"
@@ -93,9 +85,8 @@ rebuild_overlays() {
             if [[ -f "$new_overlays/$i" ]]
             then
                 enabled_overlays+=( "$i" )
-                rm -f "$new_overlays/$i"
             fi
-            rm -f "$new_overlays/$i.disabled"
+            rm -f "$new_overlays/$i" "$new_overlays/$i.disabled"
         done
     fi
 
@@ -107,28 +98,98 @@ rebuild_overlays() {
     fi
     rm -f "$new_overlays/managed.list"
     touch "$new_overlays/managed.list"
+
+    echo "Building list of compatible overlays..."
+    mapfile -t dtbos < <(dtbo_is_compatible "${dtbos[@]}")
+
+    # This loop is a bottleneck due to expensive operations
+    # Enabling parallelism brings total execution time from 38.453s to 21.633s
+    local nproc
+    nproc=$(( $(nproc) ))
+    echo "Installing compatible overlays..."
     for i in "${dtbos[@]}"
     do
-        if [[ ! -f /sys/firmware/devicetree/base/compatible ]]
-        then
-            # Assume we are running at image building stage
-            # Do not fork out so we don't trigger OOM killer
-            __rebuild_overlays_worker "$i" "$new_overlays"
-        else
-            __rebuild_overlays_worker "$i" "$new_overlays" &
-        fi
+        while (( $(jobs -r | wc -l) > nproc ))
+        do
+            sleep 0.1
+        done
+        (
+            cp "$i" "$new_overlays/$(basename "$i").disabled"
+            exec 100>>"$new_overlays/managed.list"
+            flock 100
+            basename "$i" >&100
+        ) &
     done
     wait
 
+    # This loop is not a bottleneck
+    # We add parallelism to make it uniform
+    echo "Reenable previously enabled overlays..."
     for i in "${enabled_overlays[@]}"
     do
-        if [[ -f "$new_overlays/${i}.disabled" ]]
-        then
-            mv -- "$new_overlays/${i}.disabled" "$new_overlays/$i"
-        fi
+        while (( $(jobs -r | wc -l) > nproc ))
+        do
+            sleep 0.1
+        done
+        (
+            if [[ -f "$new_overlays/${i}.disabled" ]]
+            then
+                mv -- "$new_overlays/${i}.disabled" "$new_overlays/$i"
+            fi
+        ) &
     done
+    wait
 
+    echo "Commiting changes..."
     rm -rf "${old_overlays}_old"
     mv "$old_overlays" "${old_overlays}_old"
     mv "$new_overlays" "$old_overlays"
+
+    echo "Overlay data folder has been successfully rebuilt."
+}
+
+enable_overlays() {
+    __parameter_count_at_least_check 1 "$@"
+
+    local enable_overlays_list i dir_name file_name input_check=true
+
+    load_u-boot_setting
+
+    for i in "$@"
+    do
+        dir_name="$(dirname "$i")"
+        file_name="$(basename "${i%.disabled}")"
+
+        if [[ "$dir_name" == "." ]]
+        then
+            dir_name="$U_BOOT_FDT_OVERLAYS_DIR"
+        fi
+
+        if [[ "$(realpath "$dir_name")" != "$(realpath "$U_BOOT_FDT_OVERLAYS_DIR")" ]]
+        then
+            echo "$i: only overlays within '$U_BOOT_FDT_OVERLAYS_DIR' can be enabled." >&2
+            input_check=false
+        elif [[ -e "$dir_name/$file_name.disabled" ]]
+        then
+            enable_overlays_list+=("$U_BOOT_FDT_OVERLAYS_DIR/$file_name")
+        elif [[ -e "$dir_name/$file_name" ]]
+        then
+            echo "$file_name: already enabled." >&2
+        else
+            echo "$file_name: cannot find such overlay in '$U_BOOT_FDT_OVERLAYS_DIR'"
+            input_check=false
+        fi
+    done
+
+    if ! $input_check
+    then
+        return "$ERROR_ILLEGAL_PARAMETERS"
+    fi
+
+    for i in "${enable_overlays_list[@]}"
+    do
+        mv "$i.disabled" "$i"
+    done
+
+    u-boot-update
 }

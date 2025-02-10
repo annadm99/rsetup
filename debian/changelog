@@ -1,3 +1,231 @@
+rsetup (0.4.12) jammy; urgency=medium
+
+  [ Chen Jiali ]
+  * refactor: change __hardware_gstreamer_test_picture to automatic stop
+  * fix: user: remove checklist_is_selection_empty for __user_enable_auto_login
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Fri, 10 Jan 2025 03:30:25 +0000
+
+rsetup (0.4.11) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: remove extra slash
+  * fix: check if gdm config file exist before editing
+  * format: explicitly quote strings with variables
+  * fix: do not fail if we are not inside a systemd environment
+
+  [ Chen Jiali ]
+  * fix: user: enable "Configure auto login" menu item
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Fri, 13 Sep 2024 10:40:45 +0000
+
+rsetup (0.4.10) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: do not cover console output with msgbox
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Thu, 08 Aug 2024 03:35:30 +0000
+
+rsetup (0.4.9) jammy; urgency=medium
+
+  [ CodeChenL ]
+  * fix: hardware: otg: modify to disable function before enable
+  * chore: update Depends librtui
+  * fix: update Baota install and uninstall function
+  * fix: task: change to use checklist
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Wed, 07 Aug 2024 08:48:07 +0000
+
+rsetup (0.4.8) jammy; urgency=medium
+
+  [ CodeChenL ]
+  * feat: add system_update at cli function
+  * fix: use reliable method to check package status
+  * fix: add --all options for available_targets check
+  * feat: cli: add some autologin functions
+  * feat: user: supports autologin for more session types
+  * fix: repair DISPLAY was forced to assign a value of :0
+  * chore: update Depends librtui
+  * fix: recover the correct error return value
+  * fix: bootloader: add support judgment for operations
+  * fix: use services.json to identify available udc services
+
+  [ ZHANG Yuntian ]
+  * fix: add missing semicolons
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Wed, 31 Jul 2024 06:23:04 +0000
+
+rsetup (0.4.7) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: add application title
+  * ci: explicitly set prerelease as false
+  * ci: support tlide in version number
+  * fix: get_product_ids only apply conversion to radxa compatible
+  * feat: support SPI bootloader variant
+  * fix: suffix should be added to product id
+  * feat: add more lan/wan LED configs
+  * fix: add virtual package for network LEDs
+
+  [ RadxaPanda ]
+  * feat: Add support for Baota
+
+  [ CodeChenL ]
+  * chore: update librtui
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Wed, 26 Jun 2024 10:59:56 +0000
+
+rsetup (0.4.6) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * chore: bump local libtrui submodule
+
+  [ CodeChenL ]
+  * fix: preserve video device name
+  * fix: modify the camera picture save path
+  * fix: check thermal governor compatibility first
+  * fix: modify options for querying available_targets
+  * fix: correct the erase bootloader prompt message
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Fri, 07 Jun 2024 03:02:44 +0000
+
+rsetup (0.4.5) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: include utils for CLI usage
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Thu, 23 May 2024 10:25:17 +0000
+
+rsetup (0.4.4) jammy; urgency=medium
+
+  [ dependabot[bot] ]
+  * build(deps): bump peaceiris/actions-mdbook from 1 to 2
+
+  [ CodeChenL ]
+  * refactor: replace tui dependency with librtui
+  * refactor: update dependency librtui
+  * fix: use RTUI_PALETTE_ERROR palette before return 1
+  * feat: add function to switch default target
+  * feat: add test/mpp bash-completion
+
+  [ Nascs Fang ]
+  * fix: disable service systemd-networkd
+
+  [ ZHANG Yuntian ]
+  * ci: sync with radxa-firmware
+  * feat: add mpp_enable_kernel_logging
+  * fix: disable ssh.socket as well
+  * feat: add gst_audio_resample test
+  * fix: make sure LED's trigger is as specified
+  * feat: add set_led_netdev
+  * chore: update librtui
+  * refactor: use empty selection helpers
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Wed, 22 May 2024 09:09:42 +0000
+
+rsetup (0.4.3) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * ci: sync with recent projects
+  * fix: vendor is an optional argument for rebuild_overlays
+  * fix: reintroduce parallelism to speed up rebuild_overlays
+  * feat: add logging for rebuild_overlays
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Sun, 07 Apr 2024 12:01:07 +0000
+
+rsetup (0.4.2) jammy; urgency=medium
+
+  [ CodeChenL ]
+  * fix: add missing u-boot-update in _overlay_manage
+
+  [ dependabot[bot] ]
+  * build(deps): bump actions/configure-pages from 4 to 5
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Tue, 02 Apr 2024 08:23:41 +0000
+
+rsetup (0.4.1) jammy; urgency=medium
+
+  [ dependabot[bot] ]
+  * Bump softprops/action-gh-release from 1 to 2
+
+  [ ZHANG Yuntian ]
+  * refactor: reorder make dch's argument ordering
+  * feat: add factory_stress command
+  * fix: need to split gpiofind's output into 2 arguments
+  * feat: using memtester to stress memory instead of stress-ng
+  * feat: add documentation
+  * fix: use correct MDBOOK_OUTPUT__HTML__SITE_URL
+  * fix: do not trigger code build if we are only update documentation
+  * fix: bump POT-Creation-Date
+  * doc: stress: add usage
+  * doc: stress: update translation
+  * doc: stress: make the state change more clear
+  * doc: stress: update zh-CN translation
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Fri, 15 Mar 2024 10:10:48 +0000
+
+rsetup (0.4.0) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * feat: remove rsetup-config-hciattach-ttys1
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Mon, 26 Feb 2024 18:53:43 +0800
+
+rsetup (0.3.48) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: force removel of conflicting package again
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Mon, 26 Feb 2024 10:31:27 +0000
+
+rsetup (0.3.47) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: force removal of conflicting package
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Mon, 26 Feb 2024 10:10:35 +0000
+
+rsetup (0.3.46) jammy; urgency=medium
+
+  [ CodeChenL ]
+  * perf: add a concurrency limit for parse_dtbo and dtbo_is_compatible
+  * perf: removed __rebuild_overlays_worker
+  * feat: add cli function enable_overlays
+  * fix: fixes rsetup.service running connect_wi-fi error on startup
+
+  [ ZHANG Yuntian ]
+  * fix: ttyS1 should be manage by either packages, not both
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Mon, 26 Feb 2024 09:02:27 +0000
+
+rsetup (0.3.45) jammy; urgency=medium
+
+  [ CodeChenL ]
+  * Add functions "USB OTG port functions" (#32)
+  * Multithreaded dtbo parsing (#33)
+
+  [ ZHANG Yuntian ]
+  * fix: merge changes from the same author
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Tue, 30 Jan 2024 09:36:24 +0000
+
+rsetup (0.3.44) jammy; urgency=medium
+
+  [ ZHANG Yuntian ]
+  * fix: use /proc/device-tree per kernel documentation
+  * feat: add ERROR_REQUIRE_TARGET error code and __assert_t
+  * fix: allow bootloader matching by all product ids
+  * feat: add __system_bootloader_helper
+  * feat: add erase_spinor & erase_emmc_boot support
+  * feat: prepare set_led_trigger to support leds_pwm
+  * feat: add color_picker dialog
+  * feat: add uint_inputbox
+  * feat: add support for RGB led
+  * feat: add rsetup-config-rgb0-rainbow package
+  * feat: make default rainbow pattern constant brightness
+
+ -- "Radxa Computer Co., Ltd" <dev@radxa.com>  Mon, 22 Jan 2024 08:02:52 +0000
+
 rsetup (0.3.43) jammy; urgency=medium
 
   [ CodeChenL ]
