@@ -10,6 +10,7 @@ ALLOWED_RCONFIG_FUNC+=(
     "enable_service"
     "disable_service"
     "resize_root"
+    "create_partition"
     "set_thermal_governor"
     "set_led_trigger"
     "set_led_pattern"
@@ -144,6 +145,23 @@ resize_root() {
             return 1
             ;;
     esac
+}
+
+create_partition(){
+    if lsblk -o NAME -n -i -r | grep -q "p4"; then
+        echo "partition 4 does exist"
+    else
+        echo "partition 4 doesn't exist"
+        device=$(ls /dev/mmcblk* | grep -o 'mmcblk[0-9]' | head -n 1)
+        device="/dev/$device"
+        #resize partition 3
+        echo -e "p\nd\n\nn\n\n\n30040063\nt\n\n1\nwp\n" | sudo fdisk $device
+    
+        #create p4
+        echo -e "p\nn\n\n\n\nt\n\n1\nwp\n" | fdisk $device
+        #copy p3 to p4
+        dd if=$device"p3" of=$device"p4" bs=1M
+    fi
 }
 
 set_thermal_governor() {
