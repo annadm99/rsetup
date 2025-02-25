@@ -77,6 +77,8 @@ update_locale en_US.UTF-8
 #
 if headless enable_service ssh
 
+enable_service reset_bootcount
+
 # Remove first-boot package
 # Command:
 #   remove_packages <package names>
