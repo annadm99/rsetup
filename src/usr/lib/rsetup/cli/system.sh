@@ -160,7 +160,7 @@ create_partition(){
         #create p4
         echo -e "p\nn\n\n\n\nt\n\n1\nwp\n" | fdisk $device
         #copy p3 to p4
-        dd if=$device"p3" of=$device"p4" bs=1M
+        #dd if=$device"p3" of=$device"p4" bs=1M
     fi
 }
 
