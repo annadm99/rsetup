@@ -35,12 +35,8 @@ user_append_group rock pwm
 
 # Resize root partition at the filesystem level
 #
-#resize_root
-device=$(ls /dev/mmcblk* | grep -o 'mmcblk[0-9]' | head -n 1)
-device="/dev/$device"
-#resize partition 3
-echo -e "p\nd\n\nn\n\n\n30040063\nt\n\n1\nwp\n" | sudo fdisk $device
-sudo resize2fs $device
+create_partition
+resize_root
 
 
 # Disable services
